@@ -127,6 +127,8 @@ function insertStyleElement(options, styleElement) {
 		styleElementsInsertedAtTop.push(styleElement);
 	} else if (options.insertAt === "bottom") {
 		styleTarget.appendChild(styleElement);
+    } else if (options.insertAt === "shadowRoot") {
+        styleTarget.shadowRoot.appendChild(styleElement);
 	} else {
 		throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
 	}
