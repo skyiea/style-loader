@@ -111,9 +111,13 @@ function listToStyles(list) {
 }
 
 function insertStyleElement(options, styleElement) {
-	var styleTarget = getStyleTarget(options.insertInto)
+	var styleTarget = getStyleTarget(options.insertInto);
 	if (!styleTarget) {
-		throw new Error("Couldn't find a style target. This probably means that the value for the 'insertInto' parameter is invalid.");
+        if (options.ensureInsert && options.insertInto !== "head") {
+            styleTarget = getStyleTarget("head");
+        } else {
+		    throw new Error("Couldn't find a style target. This probably means that the value for the 'insertInto' parameter is invalid.");
+        }
 	}
 	var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
 	if (options.insertAt === "top") {
@@ -128,7 +132,15 @@ function insertStyleElement(options, styleElement) {
 	} else if (options.insertAt === "bottom") {
 		styleTarget.appendChild(styleElement);
     } else if (options.insertAt === "shadowRoot") {
-        styleTarget.shadowRoot.appendChild(styleElement);
+        if (styleTarget.shadowRoot) {
+            styleTarget.shadowRoot.appendChild(styleElement);
+        } else {
+            if (options.ensureInsert) {
+                styleTarget.appendChild(styleElement);
+            } else {
+                throw new Error("There is no shadowRoot in style target");
+            }
+        }
 	} else {
 		throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
 	}
